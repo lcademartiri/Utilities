@@ -8,16 +8,21 @@ function COLORMAPS=loadColormaps()
     if ~isfolder(colormapFolderPath)
         error('The expected colormap folder does not exist at: %s', colormapFolderPath);
     end
+    addpath(colormapFolderPath);
     
-    COLORMAPS.inferno = csvread([colormapFolderPath,'\inferno_colormap.csv']);
     COLORMAPS.blackbody = csvread([colormapFolderPath,'\blackbody_colormap.csv']);
     COLORMAPS.bentcoolwarm = csvread([colormapFolderPath,'\bentcoolwarm_colormap.csv']);
     COLORMAPS.kindlmann = csvread([colormapFolderPath,'\kindlmann_colormap.csv']);
     COLORMAPS.moreland = csvread([colormapFolderPath,'\moreland_colormap.csv']);
-    COLORMAPS.plasma = csvread([colormapFolderPath,'\plasma_colormap.csv']);
     COLORMAPS.turbo = csvread([colormapFolderPath,'\turbo_colormap.csv']);
-    COLORMAPS.viridis = csvread([colormapFolderPath,'\viridis_colormap.csv']);
-    
+    COLORMAPS.viridis = viridis();
+    COLORMAPS.inferno = inferno();
+    COLORMAPS.plasma = plasma();
+    COLORMAPS.magma = magma();
+    COLORMAPS.cividis = cividis();
+    COLORMAPS.twilight = twilight();
+    COLORMAPS.twilight_shifted = twilight_shifted();
+
     fileList = dir(fullfile(colormapFolderPath, '*.mat'));
     for k = 1:length(fileList)
         baseFileName = fileList(k).name;
