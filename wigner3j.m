@@ -1,32 +1,70 @@
-function w = wigner3j(l, m1, m2, m3)
-    % Simplified Wigner 3j for (l l l; m1 m2 m3) using Racah formula
-    if (m1 + m2 + m3 ~= 0), w = 0; return; end
-    
-    % The prefactor for (l l l) case
-    % Formula: sqrt((2l-2l)!/(2l+1)!) is not right for 3j.
-    % We use the standard Racah form. For l,l,l it simplifies to:
-    t1 = l + l - l; % = l
-    t2 = l + m1; t3 = l - m1; t4 = l + m2; t5 = l - m2; t6 = l + m3; t7 = l - m3;
-    
-    % Using log-factorials for numerical stability
-    log_fact = @(n) sum(log(1:n));
-    num = log_fact(t2) + log_fact(t3) + log_fact(t4) + log_fact(t5) + log_fact(t6) + log_fact(t7);
-    den = log_fact(3*l + 1); % (j1+j2+j3+1)!
-    
-    prefactor = exp(0.5 * (num - den));
-    
-    sum_val = 0;
-    % Sum over z such that factorials are non-negative
-    z_min = max([0, m1-l, -l-m3]);
-    z_max = min([l+m2, l-m3, l+m1]);
-    
-    for z = z_min:z_max
-        term = ((-1)^(z + l + m3)) * exp(...
-            log_fact(2*l - z) + log_fact(l + z - m1) ...
-            - log_fact(z) - log_fact(l - z + m2) - log_fact(l - z - m3) - log_fact(z - m1 + l));
-        % Note: The above is a simplified Racah sum for this specific symmetry.
-        % For production, using a standard 'wigner3j' library is safer.
-        if ~isnan(term), sum_val = sum_val + term; end
-    end
-    w = prefactor * sum_val;
+
+% Wigner3j.m by David Terr, Raytheon, 6-17-04
+
+% Compute the Wigner 3j symbol using the Racah formula [1]. 
+
+function wigner = wigner3j(j1,j2,j3,m1,m2,m3)
+
+% error checking
+if ( 2*j1 ~= floor(2*j1) || 2*j2 ~= floor(2*j2) || 2*j3 ~= floor(2*j3) ...
+        || 2*m1 ~= floor(2*m1) || 2*m2 ~= floor(2*m2) || 2*m3 ~= floor(2*m3) )
+    error('All arguments must be integers or half-integers.');
+    return;
 end
+
+if ( j1 - m1 ~= floor ( j1 - m1 ) )
+    error('2*j1 and 2*m1 must have the same parity');
+    return;
+end
+
+if ( j2 - m2 ~= floor ( j2 - m2 ) )
+    error('2*j2 and 2*m2 must have the same parity');
+    return;
+end
+
+if ( j3 - m3 ~= floor ( j3 - m3 ) )
+    error('2*j3 and 2*m3 must have the same parity');
+    return;
+end
+
+if j3 > j1 + j2 || j3 < abs(j1 - j2)
+    error('j3 is out of bounds.');
+    return;
+end
+
+if abs(m1) > j1
+    error('m1 is out of bounds.');
+    return;
+end
+
+if abs(m2) > j2
+    error('m2 is out of bounds.');
+    return;
+end
+
+if abs(m3) > j3
+    error('m3 is out of bounds.');
+    return;
+end
+
+t1 = j2 - m1 - j3;
+t2 = j1 + m2 - j3;
+t3 = j1 + j2 - j3;
+t4 = j1 - m1;
+t5 = j2 + m2;
+
+tmin = max( 0, max( t1, t2 ) );
+tmax = min( t3, min( t4, t5 ) );
+
+wigner = 0;
+
+for t = tmin:tmax
+    wigner = wigner + (-1)^t / ( factorial(t) * factorial(t-t1) * factorial(t-t2) ...
+        * factorial(t3-t) * factorial(t4-t) * factorial(t5-t) );
+end
+
+wigner = wigner * (-1)^(j1-j2-m3) ...
+    * sqrt( factorial(j1+j2-j3) * factorial(j1-j2+j3) * factorial(-j1+j2+j3) / factorial(j1+j2+j3+1)...
+        * factorial(j1+m1) * factorial(j1-m1) * factorial(j2+m2) * factorial(j2-m2) * factorial(j3+m3) * factorial(j3-m3) );
+
+% Reference: Wigner 3j-Symbol entry of Eric Weinstein's Mathworld: http://mathworld.wolfram.com/Wigner3j-Symbol.html

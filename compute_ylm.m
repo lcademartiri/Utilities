@@ -1,32 +1,30 @@
 function Y = compute_ylm(l, theta, phi)
-    % Computes Y_lm for all m in [-l, l]
-    % Returns N x (2l+1)
+    % Vectorized Spherical Harmonics
+    % theta, phi are [M x 1] vectors (M = number of bonds)
+    % Returns [M x 2l+1] complex matrix
     
-    N = numel(theta);
-    Y = zeros(N, 2*l+1);
+    M = numel(theta);
+    Y = complex(zeros(M, 2*l+1));
     
-    % Legendre P_lm(cos theta)
-    % legendre(l, x) returns matrix of size (l+1) x N for m=0..l
+    % legendre(l, cos(theta)) returns (l+1) x M matrix
     P = legendre(l, cos(theta)); 
     
-    % Normalization factors
     for m = 0:l
-        % Renormalize P_lm to Spherical Harmonic convention
-        if m==0
-            norm_f = sqrt((2*l+1)/(4*pi));
+        % Precompute normalization factor
+        fac = factorial(l-m) / factorial(l+m);
+        norm_f = sqrt(((2*l+1)/(4*pi)) * fac);
+        
+        if m == 0
             Y(:, l+1) = norm_f * P(1,:)';
         else
-            fac = factorial(l-m) / factorial(l+m);
-            norm_f = sqrt( (2*l+1)/(4*pi) * fac );
-            
-            p_vec = P(m+1, :)' * norm_f;
-            
-            % m > 0: Y_lm = N * P_lm * exp(i*m*phi) * (-1)^m
+            % Vectorized phase and normalization
+            % (-1)^m is the Condon-Shortley phase
             phase = exp(1i * m * phi);
-            Y(:, l+1+m) = p_vec .* phase * (-1)^m;
+            p_vec = (norm_f * (-1)^m) * P(m+1, :)';
             
-            % m < 0: Y_l-m = conj(Y_lm) * (-1)^m
-            Y(:, l+1-m) = conj(Y(:, l+1+m)) * (-1)^m;
+            Y(:, l+1+m) = p_vec .* phase;
+            % Symmetry for negative m
+            Y(:, l+1-m) = conj(Y(:, l+1+m)) * ((-1)^m);
         end
     end
 end

@@ -7,7 +7,7 @@ function table = generate_wigner_table(l)
             if m3 < -l || m3 > l, continue; end
             
             % Compute Wigner 3j symbol (l l l; m1 m2 m3)
-            val = wigner3j(l, m1, m2, m3);
+            val = wigner3j(l, l, l, m1, m2, m3);
             if abs(val) > 1e-10
                 % Store: [index1, index2, index3, value]
                 list = [list; [m1+l+1, m2+l+1, m3+l+1, val]];
