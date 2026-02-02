@@ -12,7 +12,7 @@ close all; clc;
 
 %% 1. Parameters
 N_bins = 100;            
-N_traj = 500;           % Increased trajectory count for a dense, smooth "brushstroke" look
+N_traj = 1000;           % Increased trajectory count for a dense, smooth "brushstroke" look
 T_max  = 2;           % Extended slightly to emphasize the curve/divergence
 N_steps = 400;          % Higher resolution for smooth curves
 time_grid = linspace(0, T_max, N_steps);
