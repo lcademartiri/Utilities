@@ -3,14 +3,14 @@
 % =========================================================================
 
 % 1. INPUTS (Replace these with the values from your Origin Fit Report)
-tau_fit = 302.90672;   % Your best-fit tau
-beta_fit = 0.47036;  % Your best-fit beta
+tau_fit = 515;   % Your best-fit tau
+beta_fit = 0.44434;  % Your best-fit beta
 
 % Replace with the 2x2 section of your Origin Covariance Matrix
 % Format: [ Variance(tau)     ,  Covariance(tau, beta) ;
 %           Covariance(tau, beta),  Variance(beta)      ]
-% cov_matrix = [ 4.000,  0.015 ;   % <--- Example numbers, replace these!
-%                0.015,  0.002 ];
+cov_matrix = [ 130.10,  0.04758 ;   % <--- Example numbers, replace these!
+               0.04758,  2.01e-5 ];
 
 % 2. MONTE CARLO SETUP
 N_samples = 100000; % 100,000 simulations is standard for convergence

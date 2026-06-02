@@ -33,7 +33,8 @@ function progressUpdate(iter, total, tStart, updateFreq, metrics)
             val = metrics.(fns{i});
             % Check if value is text or number
             if ischar(val) || isstring(val)
-                metStr = [metStr, sprintf(' | %s: %s', fns{i}, val)];
+                % CRITICAL FIX: wrap val in char()
+                metStr = [metStr, sprintf(' | %s: %s', fns{i}, char(val))];
             else
                 metStr = [metStr, sprintf(' | %s: %.3g', fns{i}, val)];
             end
